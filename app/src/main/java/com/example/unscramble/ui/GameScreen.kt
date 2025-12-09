@@ -43,8 +43,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
 
+/**
+ * Composable principal que representa la pantalla del juego.
+ * @param gameViewModel El ViewModel para la pantalla del juego.
+ */
 @Composable
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
+    // Recopila el estado de la IU del juego desde el ViewModel.
     val gameUiState by gameViewModel.uiState.collectAsState()
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
@@ -62,6 +67,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
             text = stringResource(R.string.app_name),
             style = typography.titleLarge,
         )
+        // Diseño del juego que contiene la palabra desordenada, el campo de texto y los botones.
         GameLayout(
             onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
             wordCount = gameUiState.currentWordCount,
@@ -82,6 +88,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            // Botón para enviar la adivinanza.
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { gameViewModel.checkUserGuess() }
@@ -92,6 +99,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 )
             }
 
+            // Botón para saltar a la siguiente palabra.
             OutlinedButton(
                 onClick = { gameViewModel.skipWord() },
                 modifier = Modifier.fillMaxWidth()
@@ -103,8 +111,10 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
             }
         }
 
+        // Muestra el estado actual del juego (puntuación).
         GameStatus(score = gameUiState.score, modifier = Modifier.padding(20.dp))
 
+        // Muestra el cuadro de diálogo de puntuación final cuando el juego termina.
         if (gameUiState.isGameOver) {
             FinalScoreDialog(
                 score = gameUiState.score,
@@ -114,6 +124,11 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
     }
 }
 
+/**
+ * Composable que muestra la puntuación actual.
+ * @param score La puntuación actual.
+ * @param modifier El modificador para aplicar a este composable.
+ */
 @Composable
 fun GameStatus(score: Int, modifier: Modifier = Modifier) {
     Card(
@@ -128,6 +143,16 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
     }
 }
 
+/**
+ * Composable para el diseño del juego.
+ * @param currentScrambledWord La palabra desordenada actual.
+ * @param wordCount El número de palabras adivinadas.
+ * @param isGuessWrong Si la adivinanza del usuario es incorrecta.
+ * @param userGuess La adivinanza actual del usuario.
+ * @param onUserGuessChanged La devolución de llamada que se activa cuando el usuario cambia su adivinanza.
+ * @param onKeyboardDone La devolución de llamada que se activa cuando el usuario presiona el botón "listo" en el teclado.
+ * @param modifier El modificador para aplicar a este composable.
+ */
 @Composable
 fun GameLayout(
     currentScrambledWord: String,
@@ -159,15 +184,18 @@ fun GameLayout(
                 style = typography.titleMedium,
                 color = colorScheme.onPrimary
             )
+            // Muestra la palabra desordenada.
             Text(
                 text = currentScrambledWord,
                 style = typography.displayMedium
             )
+            // Muestra las instrucciones.
             Text(
                 text = stringResource(R.string.instructions),
                 textAlign = TextAlign.Center,
                 style = typography.titleMedium
             )
+            // Campo de texto para la adivinanza del usuario.
             OutlinedTextField(
                 value = userGuess,
                 singleLine = true,
@@ -198,7 +226,12 @@ fun GameLayout(
     }
 }
 
-
+/**
+ * Composable para el cuadro de diálogo de puntuación final.
+ * @param score La puntuación final.
+ * @param onPlayAgain La devolución de llamada que se activa cuando el usuario presiona el botón "Jugar de nuevo".
+ * @param modifier El modificador para aplicar a este composable.
+ */
 @Composable
 private fun FinalScoreDialog(
     score: Int,
@@ -209,9 +242,8 @@ private fun FinalScoreDialog(
 
     AlertDialog(
         onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onCloseRequest.
+            // Descarta el cuadro de diálogo cuando el usuario hace clic fuera del cuadro de diálogo o en el botón de retroceso.
+            // Si deseas deshabilitar esa funcionalidad, simplemente usa una solicitud onCloseRequest vacía.
         },
         title = { Text(text = stringResource(R.string.congratulations)) },
         text = { Text(text = stringResource(R.string.you_scored, score)) },
